@@ -1,0 +1,179 @@
+:root {
+  --gap: 12px;
+  --accent: #50fc00;
+  --bg: #f7f9fc;
+  --bg-1: #e6f0ff;
+  --bg-2: #f3f8ff;
+  --bg-3: #ffffff;
+  --muted: #666;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Segoe UI, Roboto, Arial, sans-serif;
+  /* Animated, flowing background gradient. Keeps a soft, professional look.
+     Uses background-size + keyframes to slowly shift the gradient. */
+  background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-size: 200% 200%;
+  animation: bgShift 14s ease-in-out infinite;
+  color: #111;
+  margin: 0;
+  padding: 20px;
+}
+
+@keyframes bgShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+h1 {
+  margin-top: 0;
+}
+
+fieldset {
+  border: 1px solid #e2e8f0;
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 6px;
+}
+
+legend {
+  font-weight: 600;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.row {
+  display: flex;
+  gap: var(--gap);
+}
+
+.col {
+  flex: 1;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+button {
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button#resetBtn {
+  background: #6b7280;
+}
+
+.required {
+  color: #b91c1c;
+}
+
+.hidden {
+  display: none;
+}
+
+.grouped {
+  margin-left: 6px;
+  padding: 8px;
+  border-left: 3px solid #eef2ff;
+  background: #fbfdff;
+}
+
+#progressWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+progress {
+  width: 160px;
+  height: 14px;
+}
+
+.hint {
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+#summaryContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.summary-card {
+  background: #fff;
+  border: 1px solid #e6eefc;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+@media (max-width: 700px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .container {
+    padding: 12px;
+  }
+
+  #summaryContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+.warning {
+  color: #b45309;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.info {
+  color: #8d1313;
+}
+
+small.note {
+  display: block;
+  color: var(--muted);
+  margin-top: -6px;
+  margin-bottom: 8px;
+}

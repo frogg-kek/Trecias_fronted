@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Anketa</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Anketa</h1>
+
+    <section class="status">
+      <div id="progressWrap">
+        <label for="progress">Progresas:</label>
+        <progress id="progress" value="0" max="100"></progress>
+        <span id="progressText">0%</span>
+      </div>
+      <div id="statusMessage" class="hint"></div>
+    </section>
+
+    <form id="surveyForm" novalidate>
+      <fieldset>
+        <legend>Asmens duomenys</legend>
+
+        <label for="gender">Lytis <span class="required">*</span></label>
+        <select id="gender" name="gender" required>
+          <option value="">-- Pasirinkite --</option>
+          <option value="vyras">Vyras</option>
+          <option value="moteris">Moteris</option>
+        </select>
+
+        <div class="row">
+          <div class="col">
+            <label for="firstName">Vardas <span class="required">*</span></label>
+            <input id="firstName" name="firstName" type="text" required />
+          </div>
+          <div class="col">
+            <label for="middleName">Antras vardas</label>
+            <input id="middleName" name="middleName" type="text" />
+          </div>
+          <div class="col">
+            <label for="lastName">Pavardė <span class="required">*</span></label>
+            <input id="lastName" name="lastName" type="text" required />
+          </div>
+        </div>
+
+        <label for="birthdate">Gimimo data <span class="required">*</span></label>
+        <input id="birthdate" name="birthdate" type="date" required />
+
+        <label for="personalCode">Asmens kodas</label>
+        <input id="personalCode" name="personalCode" type="text" placeholder="YYMMDD..." />
+      </fieldset>
+
+      <fieldset>
+        <legend>Išsilavinimas</legend>
+        <label for="education">Išsilavinimas <span class="required">*</span></label>
+        <select id="education" name="education" required>
+          <option value="">-- Pasirinkite --</option>
+          <option value="pagrindinis">Pagrindinis</option>
+          <option value="vidurinis">Vidurinis</option>
+          <option value="profesinis">Profesinis</option>
+          <option value="aukst_kolegija">Aukštasis - Kolegijinis</option>
+          <option value="aukst_universitetas">Aukštasis - Universitetinis</option>
+        </select>
+
+        <div id="educationDetails" class="hidden grouped">
+          <label for="eduInstitution">Įstaiga</label>
+          <input id="eduInstitution" name="eduInstitution" type="text" />
+
+          <label for="eduYear">Baigimo metai</label>
+          <input id="eduYear" name="eduYear" type="number" min="1900" max="2100" />
+
+          <label for="qualification">Kvalifikacija</label>
+          <input id="qualification" name="qualification" type="text" />
+
+          <label for="degree">Mokslo laipsnis</label>
+          <select id="degree" name="degree">
+            <option value="">--</option>
+            <option value="bakalauras">Bakalauras</option>
+            <option value="magistras">Magistras</option>
+            <option value="daktaras">Mokslų daktaras</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Kontaktai</legend>
+        <label for="phone">Telefono numeris <span class="required">*</span></label>
+        <input id="phone" name="phone" type="tel" placeholder="+3706xxxxxxx" required />
+
+        <label for="email">El. paštas <span class="required">*</span></label>
+        <input id="email" name="email" type="email" placeholder="pvz. vardas@pvz.lt" required />
+
+        <label for="address">Adresas</label>
+        <input id="address" name="address" type="text" />
+      </fieldset>
+
+      <fieldset>
+        <legend>Asmeninė / profesinė informacija</legend>
+
+        <label for="marital">Vedybinė padėtis <span class="required">*</span></label>
+        <select id="marital" name="marital" required>
+          <option value="">-- Pasirinkite --</option>
+          <option value="nevedes">Nevedęs / netekėjusi</option>
+          <option value="vedes">Vedęs / ištekėjusi</option>
+          <option value="issiskyre">Išsiskyręs(-usi)</option>
+        </select>
+
+        <div id="spouseDetails" class="hidden grouped">
+          <label for="spouseName">Sutuoktinio(-ės) — vardas, pavardė</label>
+          <input id="spouseName" name="spouseName" type="text" />
+        </div>
+
+        <label for="profStatus">Profesinė padėtis</label>
+        <select id="profStatus" name="profStatus">
+          <option value="">--</option>
+          <option value="studijuoja">Studijuoja</option>
+          <option value="dirba">Dirba</option>
+          <option value="nedirba">Nedirba</option>
+          <option value="atostogos">Motinystės/tėvystės atostogos</option>
+        </select>
+
+        <div id="profDetails" class="hidden grouped">
+          <div id="studyBlock" class="hidden">
+            <label for="studyLevel">Studijų pakopa įstaiga</label>
+            <input id="studyLevel" name="studyLevel" type="text" />
+            <label for="studyFinish">Tikėtini baigimo metai</label>
+            <input id="studyFinish" name="studyFinish" type="number" min="2020" max="2100" />
+          </div>
+
+          <div id="workBlock" class="hidden">
+            <label for="workPlace">Darbo įstaiga, pareigos</label>
+            <input id="workPlace" name="workPlace" type="text" />
+          </div>
+
+          <div id="unempBlock" class="hidden">
+            <label for="unempReason">Nedarbo priežastis</label>
+            <input id="unempReason" name="unempReason" type="text" />
+          </div>
+
+          <div id="leaveBlock" class="hidden">
+            <label for="leaveEnd">Atostogų pabaiga</label>
+            <input id="leaveEnd" name="leaveEnd" type="date" />
+          </div>
+        </div>
+
+        <label for="experience">Darbo patirtis (metai)</label>
+        <input id="experience" name="experience" type="number" min="0" max="100" />
+
+        <label for="workField">Darbo sritis</label>
+        <select id="workField" name="workField">
+          <option value="">--</option>
+          <option>Teisė</option>
+          <option>Viešasis sektorius</option>
+          <option>Sveikatos apsauga</option>
+          <option>Farmacija</option>
+          <option>Pramonė / gamyba</option>
+          <option>IT</option>
+          <option>Prekyba</option>
+          <option>Krašto apsauga</option>
+          <option>Vidaus reikalai</option>
+          <option>Klientų aptarnavimas</option>
+          <option>Transportas</option>
+          <option>Kultūra ir pramogos</option>
+          <option>Švietimas / studijos</option>
+        </select>
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit">Pateikti</button>
+        <button type="button" id="resetBtn">Išvalyti</button>
+      </div>
+    </form>
+
+    <section id="summary" class="hidden">
+      <h2>Įvesti duomenys (kategorijos)</h2>
+      <div id="summaryContent"></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
