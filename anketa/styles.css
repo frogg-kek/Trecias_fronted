@@ -177,3 +177,17 @@ small.note {
   margin-top: -6px;
   margin-bottom: 8px;
 }
+
+/* Inline field error styles */
+.invalid-field {
+  border-color: #b91c1c !important;
+  box-shadow: 0 0 0 3px rgba(185,28,28,0.06);
+}
+
+.inline-error {
+  display: block;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  margin-top: -6px;
+  margin-bottom: 8px;
+}

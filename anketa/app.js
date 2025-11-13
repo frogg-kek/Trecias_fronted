@@ -31,6 +31,105 @@ function updateProgress(){
   progressText.textContent = pct + '%';
 }
 
+// Mark labels that contain a span.required as required inputs and return the list
+function markAsteriskRequired(){
+  const requiredEls = [];
+  document.querySelectorAll('label').forEach(label => {
+    if(label.querySelector('.required')){
+      const id = label.getAttribute('for');
+      if(id){
+        const el = qs(id);
+        if(el){
+          el.required = true;
+          requiredEls.push(el);
+        }
+      }
+    }
+  });
+  return requiredEls;
+}
+
+function isElementVisible(el){
+  if(!el) return false;
+  // consider hidden by utility class 'hidden' or not in layout
+  if(el.classList && el.classList.contains('hidden')) return false;
+  if(el.offsetParent === null) return false;
+  return true;
+}
+
+function getLabelTextFor(id){
+  const lbl = document.querySelector('label[for="'+id+'"]');
+  if(!lbl) return id;
+  // remove any '*' span text
+  const clone = lbl.cloneNode(true);
+  const star = clone.querySelector('.required');
+  if(star) star.remove();
+  return clone.textContent.trim();
+}
+
+function checkRequiredFields(){
+  // find all inputs/selects that are marked required by attribute and are visible
+  const missing = [];
+  const requiredEls = Array.from(document.querySelectorAll('input[required],select[required],textarea[required]'));
+  for(const el of requiredEls){
+    // skip elements that are hidden (their visibility controlled by .hidden or not in layout)
+    if(!isElementVisible(el)) continue;
+    // treat empty as missing; for checkboxes/radios additional logic could be added
+    const val = el.value;
+    const valid = el.checkValidity();
+    if(!val || !valid){
+      missing.push({id: el.id || el.name || '(field)', label: getLabelTextFor(el.id || el.name) });
+    }
+  }
+  return missing;
+}
+
+function showRequiredMissingMessage(missing){
+  if(!missing || missing.length === 0){
+    statusMessage.textContent = '';
+    statusMessage.className = 'hint';
+    return;
+  }
+  const names = missing.map(m => m.label);
+  statusMessage.textContent = 'Neužpildyti privalomi laukai: ' + names.join(', ');
+  statusMessage.className = 'hint error';
+}
+
+// Field-level error helpers
+function clearFieldError(el){
+  if(!el) return;
+  el.classList.remove('invalid-field');
+  const next = el.nextElementSibling;
+  if(next && next.classList && next.classList.contains('inline-error')){
+    next.remove();
+  }
+}
+
+function setFieldError(el, message){
+  if(!el) return;
+  clearFieldError(el);
+  el.classList.add('invalid-field');
+  const small = document.createElement('small');
+  small.className = 'inline-error';
+  small.textContent = message;
+  // insert after the element
+  if(el.parentNode){
+    // If there's a following sibling (like a label) just insert after the element itself
+    if(el.nextSibling) el.parentNode.insertBefore(small, el.nextSibling);
+    else el.parentNode.appendChild(small);
+  }
+}
+
+function clearAllFieldErrors(){
+  document.querySelectorAll('.invalid-field').forEach(el => el.classList.remove('invalid-field'));
+  document.querySelectorAll('.inline-error').forEach(n => n.remove());
+}
+
+function showStatusMessage(text, level='error'){
+  statusMessage.textContent = text || '';
+  statusMessage.className = text ? ('hint ' + level) : 'hint';
+}
+
 function syncFormData(){
   const fields = ['gender','firstName','middleName','lastName','birthdate','personalCode','education','eduInstitution','eduYear','qualification','degree','phone','email','address','marital','spouseName','profStatus','studyLevel','studyFinish','workPlace','unempReason','leaveEnd','experience','workField'];
   fields.forEach(f => {
@@ -274,6 +373,8 @@ function showSummary(){
 [...document.querySelectorAll('input,select')].forEach(el => {
   el.addEventListener('input', e => {
     if(e.target.id === 'personalCode') e.target.dataset.manual = '1';
+    // clear inline error for this field as user types
+    clearFieldError(e.target);
     updateProgress();
   });
 });
@@ -290,17 +391,37 @@ qs('marital').addEventListener('change', updateMaritalUI);
 
 surveyForm.addEventListener('submit', e => {
   e.preventDefault();
+  // Check required fields (those marked with asterisk) first
+  clearAllFieldErrors();
+  const missing = checkRequiredFields();
+  if(missing.length){
+    // show inline errors for each missing
+    missing.forEach(m => {
+      const el = document.getElementById(m.id);
+      setFieldError(el, 'Šis laukas privalomas');
+    });
+    showRequiredMissingMessage(missing);
+    // focus first missing field
+    const first = document.getElementById(missing[0].id);
+    if(first) first.focus();
+    return;
+  }
   // sinchronizuoti duomenis iš formos į formData objektą
   syncFormData();
   // validacijos (pvz., telefono ir el. pašto formato patikra, amžiaus taisyklės)
-  const errors = [];
-  if(!validatePhone(formData.phone)) errors.push('Telefono numeris turi būti formatu +3706xxxxxxx');
-  if(!validateEmail(formData.email)) errors.push('El. pašto adresas neteisingas');
+  const fieldErrors = [];
+  if(!validatePhone(formData.phone)) fieldErrors.push({id:'phone', message: 'Telefono numeris turi būti formatu +3706xxxxxxx'});
+  if(!validateEmail(formData.email)) fieldErrors.push({id:'email', message: 'El. pašto adresas neteisingas'});
   const age = computeAge(formData.birthdate);
-  if(age !== null && formData.marital === 'vedes' && age < 16) errors.push('Sutuoktinis negali būti nurodytas jei asmuo jaunesnis nei 16 m.');
+  if(age !== null && formData.marital === 'vedes' && age < 16) fieldErrors.push({id:'marital', message: 'Sutuoktinis negali būti nurodytas jei asmuo jaunesnis nei 16 m.'});
 
-  if(errors.length){
-    alert('Patikrinkite šiuos klaidų pranešimus:\n- ' + errors.join('\n- '));
+  if(fieldErrors.length){
+    // show inline field errors
+    fieldErrors.forEach(fe => {
+      const el = qs(fe.id);
+      setFieldError(el, fe.message);
+    });
+    showStatusMessage(fieldErrors.map(f=>f.message).join(' | '), 'error');
     return;
   }
 
@@ -316,11 +437,27 @@ qs('resetBtn').addEventListener('click', () => {
   qs('summary').classList.add('hidden');
   progress.value = 0; progressText.textContent = '0%';
   statusMessage.textContent = '';
+  clearAllFieldErrors();
   for(const k in formData) delete formData[k];
 });
 
 // Pradinė UI būsena: atnaujinti rodomus laukus ir progreso indikatorių
 updateEducationUI(); updateProfUI(); updateMaritalUI(); updateProgress();
+
+// Ensure fields with asterisk are set as required and attach listeners to clear errors
+const starred = markAsteriskRequired();
+starred.forEach(el => {
+  el.addEventListener('input', () => {
+    const miss = checkRequiredFields();
+    if(miss.length === 0) showRequiredMissingMessage([]);
+    updateProgress();
+  });
+  el.addEventListener('change', () => {
+    const miss = checkRequiredFields();
+    if(miss.length === 0) showRequiredMissingMessage([]);
+    updateProgress();
+  });
+});
 
 // formData eksponuojamas konsolėje (naudinga derinimui / inspect devtools)
 window.formData = formData;
