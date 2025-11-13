@@ -264,6 +264,23 @@ function maritalAgeCheck() {
   statusMessage.textContent = msg.join(' ');
 }
 
+// Jei amžius mažesnis nei 16, neleidžiam pateikti formos
+function disallowUnder16Submission() {
+  var bdEl = getEl('birthdate');
+  if (!bdEl || !bdEl.value) return false; // nėra duomenų -> kiti patikrinimai pasirūpins
+
+  var age = computeAge(bdEl.value);
+  if (age !== null && age < 16) {
+    // pažymim klaidą prie gimimo datos
+    setFieldError(bdEl, 'Asmuo jaunesnis nei 16 metų negali pateikti formos.');
+    showSadEffect('Negalima pateikti — amžius mažesnis nei 16 m.');
+    try { bdEl.focus(); } catch (e) {}
+    return true; // blokuojam submit
+  }
+
+  return false;
+}
+
 
 // Ar elementas matomas (neužslėptas)
 function isElementVisible(el) {
@@ -466,6 +483,11 @@ if (maritalSelect) {
 if (surveyForm) {
   surveyForm.addEventListener('submit', function (e) {
     e.preventDefault();
+    // Išvalome senas klaidas
+    clearAllFieldErrors();
+
+    // Jei amžius < 16, blokuojam pateikimą
+    if (disallowUnder16Submission()) return;
 
     // 1) Required laukų tikrinimas
     var missing = checkRequiredFields();
