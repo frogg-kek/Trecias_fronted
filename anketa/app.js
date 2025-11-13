@@ -282,7 +282,7 @@ function disallowUnder16Submission() {
 }
 
 
-// Ar elementas matomas (neužslėptas)
+// Ar elementas matomas (neužslėptas) - patikriniti
 function isElementVisible(el) {
   if (!el) return false;
   if (el.classList && el.classList.contains('hidden')) return false;
