@@ -264,22 +264,6 @@ function maritalAgeCheck() {
   statusMessage.textContent = msg.join(' ');
 }
 
-// Jei amžius mažesnis nei 16, neleidžiam pateikti formos
-function disallowUnder16Submission() {
-  var bdEl = getEl('birthdate');
-  if (!bdEl || !bdEl.value) return false; // nėra duomenų -> kiti patikrinimai pasirūpins
-
-  var age = computeAge(bdEl.value);
-  if (age !== null && age < 16) {
-    // pažymim klaidą prie gimimo datos
-    setFieldError(bdEl, 'Asmuo jaunesnis nei 16 metų negali pateikti formos.');
-    showSadEffect('Negalima pateikti — amžius mažesnis nei 16 m.');
-    try { bdEl.focus(); } catch (e) {}
-    return true; // blokuojam submit
-  }
-
-  return false;
-}
 
 
 // Ar elementas matomas (neužslėptas) - patikriniti
@@ -346,6 +330,24 @@ function showStatusMessage(text, level) {
 
   statusMessage.textContent = text || '';
   statusMessage.className = text ? ('hint ' + level) : 'hint';
+}
+
+// Išvalo ankstesnes lauko klaidas / bendrą statusą
+function clearAllFieldErrors() {
+  // Pašaliname klasės žymes, aria-invalid ir title atributus, jei buvo pridėti
+  var marked = document.querySelectorAll('.field-error, .error-field');
+  marked.forEach(function (el) {
+    el.classList.remove('field-error');
+    el.classList.remove('error-field');
+    el.removeAttribute('title');
+    el.removeAttribute('aria-invalid');
+  });
+
+  // Taip pat išvalome bendrą statuso žinutę
+  if (statusMessage) {
+    statusMessage.textContent = '';
+    statusMessage.className = 'hint';
+  }
 }
 
 function showSummary() {
@@ -486,9 +488,6 @@ if (surveyForm) {
     // Išvalome senas klaidas
     clearAllFieldErrors();
 
-    // Jei amžius < 16, blokuojam pateikimą
-    if (disallowUnder16Submission()) return;
-
     // 1) Required laukų tikrinimas
     var missing = checkRequiredFields();
     if (missing.length) {
@@ -513,8 +512,13 @@ if (surveyForm) {
     }
 
     var age = computeAge(formData.birthdate);
-    if (age !== null && formData.marital === 'vedes' && age < 16) {
-      fieldErrors.push('Sutuoktinis negali būti nurodytas jei asmuo jaunesnis nei 16 m.');
+    // Patikrinimas: jei nurodyta, kad vedęs, reikia turėti gimimo datą ir būti ne jaunesniam nei 16 m.
+    if (formData.marital === 'vedes') {
+      if (age === null) {
+        fieldErrors.push('Gimimo data privaloma, kad būtų galima patikrinti santuokos amžių.');
+      } else if (age < 16) {
+        fieldErrors.push('Sutuoktinis negali būti nurodytas jei asmuo jaunesnis nei 16 m.');
+      }
     }
 
     if (fieldErrors.length) {
